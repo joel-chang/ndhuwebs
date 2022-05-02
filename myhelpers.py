@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from student_def import Student
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException,  WebDriverException
 import time
 
 
@@ -27,7 +27,14 @@ def login(_username, _password, browser):
     elif browser == 'firefox':
         profile.accept_untrusted_certs = True
         driver = webdriver.Firefox(firefox_profile=profile)
-    driver.get('http://www.elearn.ndhu.edu.tw/')
+    
+    for i in range(50):
+        try:
+            driver.get('http://www.elearn.ndhu.edu.tw/')
+            break
+        except WebDriverException:
+            print("Couldn't connect, sleeping 10 seconds before retrying.")
+        time.sleep(10)
 
     username = driver.find_element_by_xpath('//*[@id="login_username"]')
     username.send_keys(_username)
