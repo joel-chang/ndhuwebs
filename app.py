@@ -9,12 +9,18 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 import argparse
 
-parser = argparse.ArgumentParser(description="Why your NDHU E-Learning password should be different from your usual password.")
-parser.add_argument('--list', type=dir_path, help="Path to list of students (if you happen to know those who haven't changed their passwords).")
-parser.add_argument('--generate-list', action='store_true', help="Too lazy to give a list? Use this option. (W.I.P.)")
-parser.add_argument('--skip-try', action='store_true', help='When you just know that your input is right or that no one changes their passwords.')
-parser.add_argument('--get-grades', action='store_true', help="If you also need to know grades for some reason, proceed with caution.")
-parser.add_argument('--browser', type=str, default='chrome', help="Your favorite browser, as long as it's either chrome or firefox.")
+parser = argparse.ArgumentParser(
+    description="Why your NDHU E-Learning password should be different from your usual password.")
+parser.add_argument('--list', type=dir_path,
+                    help="Path to list of students (if you happen to know those who haven't changed their passwords).")
+parser.add_argument('--generate-list', action='store_true',
+                    help="Too lazy to give a list? Use this option. (W.I.P.)")
+parser.add_argument('--skip-try', action='store_true',
+                    help='When you just know that your input is right or that no one changes their passwords.')
+parser.add_argument('--get-grades', action='store_true',
+                    help="If you also need to know grades for some reason, proceed with caution.")
+parser.add_argument('--browser', type=str, default='chrome',
+                    help="Your favorite browser, as long as it's either chrome or firefox.")
 args = parser.parse_args()
 
 print(args)

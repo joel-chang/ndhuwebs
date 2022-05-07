@@ -76,13 +76,13 @@ def generate_list(
         inc = -1
 
     print(f"Generating list with the following parameters:\n")
-    print("Including " + 
-        ("BACHELOR " if bachelors else "") +
-        ("MASTER " if masters else "") +
-        ("PHD " if phd else "") +
-        f"students from years {_year0} through {_year1} " +
-        f"and departments {_dep0} through {_dep1} " +
-        f"with final digits {_sid0} through {_sid1}.")
+    print("Including " +
+          ("BACHELOR " if bachelors else "") +
+          ("MASTER " if masters else "") +
+          ("PHD " if phd else "") +
+          f"students from years {_year0} through {_year1} " +
+          f"and departments {_dep0} through {_dep1} " +
+          f"with final digits {_sid0} through {_sid1}.")
     candidates = []
     for degree in degrees:
         for year in range(_year0, _year1, inc):
