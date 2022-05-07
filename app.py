@@ -18,20 +18,28 @@ parser.add_argument('--browser', type=str, default='chrome')
 args = parser.parse_args()
 
 print(args)
-input()
+
 candidates = []
 if args.list:
+    print(f"Importing list from: '{args.list}'")
     with open(args.list, 'r') as input_file:
         entries = input_file
         for entry in entries:
             candidates.append(entry.strip())
+        print('IDs found in list: ')
+        print(candidates)
 else:
     candidates = generate_list()
+    print('IDs generated: ')
+    print(candidates)
 
-print(candidates)
-input()
-
-unchanged = candidates if args.skip_try else get_unchanged(candidates, args.browser)
+unchanged = []
+if args.skip_try:
+    print('--skip-try argument given. Will skip trying to log in.')
+    unchanged = candidates
+else:
+    print('Will try to login with default passwords.')
+    unchanged = get_unchanged(candidates, args.browser)
 
 if not args.skip_grades:
     for user in unchanged:

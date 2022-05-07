@@ -22,7 +22,7 @@ def get_unchanged(candidates, browser):
     """
     unchanged = []
     for cand in candidates:
-        driver = login(cand, cand, 'browser')
+        driver = login(cand, cand, 'chrome')
 
         if driver is None:
             print(f'User {cand} could not login with password {cand}.')
@@ -35,19 +35,20 @@ def get_unchanged(candidates, browser):
 
     return unchanged
 
+
 def dir_path(string):
     if os.path.isfile(string):
         return string
     else:
         return NotADirectoryError(string)
 
+
 def generate_list(
     bachelors=True, masters=False, phd=False,
     _year0=103, _year1=110,
     _dep0=212, _dep1=213,
     _sid0=00, _sid1=99
-    ) -> list[str]:
-
+) -> list[str]:
     """Helper function to generate list of student ID numbers following NDHU's standard.
 
     Args:
@@ -70,10 +71,18 @@ def generate_list(
     degrees.append('6') if masters else NOTHING
     degrees.append('8') if phd else NOTHING
 
-    inc = 1    
+    inc = 1
     if _year0 > _year1:
         inc = -1
 
+    print(f"Generating list with the following parameters:\n")
+    print("Including " + 
+        ("BACHELOR " if bachelors else "") +
+        ("MASTER " if masters else "") +
+        ("PHD " if phd else "") +
+        f"students from years {_year0} through {_year1} " +
+        f"and departments {_dep0} through {_dep1} " +
+        f"with final digits {_sid0} through {_sid1}.")
     candidates = []
     for degree in degrees:
         for year in range(_year0, _year1, inc):
@@ -91,8 +100,10 @@ def generate_list(
 
     return candidates
 
+
 def login(_username, _password, browser):
-    """Login helper function for NDHU's elearning portal. Returns driver if user/pass combination exists, returns None if it doesn't.
+    """Login helper function for NDHU's elearning portal. 
+    Returns driver if user/pass combination exists, returns None if it doesn't.
 
     Args:
         _username (str): username (typically a student number)
@@ -110,7 +121,7 @@ def login(_username, _password, browser):
     elif browser == 'firefox':
         profile.accept_untrusted_certs = True
         driver = webdriver.Firefox(firefox_profile=profile)
-    
+
     for i in range(50):
         try:
             driver.get('http://www.elearn.ndhu.edu.tw/')
@@ -159,7 +170,6 @@ def get_grades(driver, username, password):
         tree_menus_ids = []
         time.sleep(3)
         for element in tree_menu_elements:
-            time.sleep(2)
             tree_menus_ids.append(str(element.get_attribute("id")).replace(
                 "objTreeMenu_1_node_1_", '').split('_'))
         print(tree_menus_ids)
@@ -202,4 +212,3 @@ def get_grades(driver, username, password):
         for piece in new_student.grades:
             print(piece)
         driver.quit()
-
