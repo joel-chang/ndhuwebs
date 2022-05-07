@@ -1,55 +1,40 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from myhelpers import login, get_grades
+from myhelpers import generate_list, get_unchanged, login, get_grades, dir_path
 from student_def import Student
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
+import argparse
 
+parser = argparse.ArgumentParser(description='arg_description.txt')
+parser.add_argument('--list', type=dir_path)
+parser.add_argument('--generate-list', action='store_true')
+parser.add_argument('--skip-try', action='store_true')
+parser.add_argument('--skip-grades', action='store_true')
+parser.add_argument('--browser', type=str, default='chrome')
+args = parser.parse_args()
 
-# dyyykkknn where d is degree, yyy is year, kkk is dept, nn is student number within dept, year and degree
+print(args)
+input()
 candidates = []
-degrees = ['4']
+if args.list:
+    with open(args.list, 'r') as input_file:
+        entries = input_file
+        for entry in entries:
+            candidates.append(entry.strip())
+else:
+    candidates = generate_list()
 
-for degree in degrees:
-    for year in range(110, 103, -1):
-        for dep in range(212, 214):
-            for number in range(1, 100):
-                new_stud = degree + str(year)
-                dept = str(dep)
-                dept = f'{dept: >3}'.format('0').replace(' ', '0')
-                num = str(number)
-                num = f'{num: >2}'.format('0').replace(' ', '0')
-                new_stud += dept
-                new_stud += num
-                candidates.append(new_stud)
-                # print(new_stud)
-
-# input()
-unchanged = []
-for cand in candidates:
-    driver = login(cand, cand, 'firefox')
-
-    if driver is None:
-        print(f'User {cand} could not login with password {cand}.')
-    else:
-        print(f'User {cand} has not changed their password.')
-        unchanged.append(cand)
-        # get_grades(driver, cand, cand)
-
-print('Results: ')
-print("List of users who haven't changed their passwords.")
-print(unchanged)
-print()
-
-print("Would you like to continue to get their grades as well? (Press any key to continue)")
-input()
-print("Are you sure? (Press any key to continue.)")
+print(candidates)
 input()
 
-for user in unchanged:
-    driver = login(user, user)
-    print(f"Getting user {user} grades now.")
-    get_grades(driver, cand, cand)
+unchanged = candidates if args.skip_try else get_unchanged(candidates, args.browser)
+
+if not args.skip_grades:
+    for user in unchanged:
+        driver = login(user, user, args.browser)
+        print(f"Getting user {user} grades now.")
+        get_grades(driver, user, user)
