@@ -1,12 +1,4 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
 from myhelpers import generate_list, get_unchanged, login, get_grades, dir_path
-from student_def import Student
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.common.action_chains import ActionChains
 import argparse
 
 parser = argparse.ArgumentParser(
