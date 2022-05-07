@@ -1,7 +1,5 @@
-# python stuff
-pyvenv.cfg
-bin/
-include/
-lib/
-lib64/
-/__pycache__
+# exclude everything except app, helpers and student_def
+/*
+!app.py
+!myhelpers.py
+!student_def.py
