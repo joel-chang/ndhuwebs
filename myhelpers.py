@@ -45,7 +45,7 @@ def from_grades_page_click_file(driver, username, assignment_link, hints): #"Mid
             while (get_latest_in_dir(dirs["download"]).startswith("Unconfirmed")):
                 time.sleep(2)
             downloaded_file = get_latest_in_dir(dirs["download"])
-            new_filename = get_latest_in_dir(dirs["download"]).replace(hint, f"{username}_{hint}")
+            new_filename = get_latest_in_dir(dirs["download"]).replace(hint, f"_{username}{hint}")
             os.rename(downloaded_file, new_filename)
             break
         except NoSuchElementException as e:
