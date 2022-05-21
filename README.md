@@ -11,8 +11,9 @@ Tool to see who hasn't changed their password in NDHU's elearning portal.
   ```
   python -m venv ndhuwebs/
   ```
-3. Install a browser and it's corresponding driver (only chrome/chromedriver and firefox/geckodriver supported).
-4. Install selenium using pip. Experiment with different version according to your browser/driver.
+3. Activate the virtual environment.
+5. Install a browser and it's corresponding driver (only chrome/chromedriver and firefox/geckodriver supported).
+6. Install selenium using pip. Experiment with different versions according to your browser/driver.
   ```
   pip install selenium
   ```
