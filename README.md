@@ -20,4 +20,9 @@ Tool to see who hasn't changed their password in NDHU's elearning portal.
 
 ## Tested setups
 * Google Chrome 101.0.4951.41 (Official Build) (64-bit) with ChromeDriver 2.41.578700 and selenium version 3.141.0
-* Mozilla Firefox for Parrot OS 91.7.0esr (64-bit) with geckodriver 0.31.0 and selenium version 4.0.0a1
+* (Not anymore, probably broke) Mozilla Firefox for Parrot OS 91.7.0esr (64-bit) with geckodriver 0.31.0 and selenium version 4.0.0a1
+
+#TODO
+* CLI argument logic sucks.
+* Support Firefox again, should probably stop using Chrome.
+* Again, arguments suck. Maybe explain usage, give examples, or think of a better way to use the program.
