@@ -32,16 +32,20 @@ if args.lang is not None:
 candidates = []
 
 if args.get_students == True:
-    semester = args.from_semester if args.from_semester else input('Please enter desired semester: ')
-    course =  args.from_course if args.from_course else input('Please enter desired course: ')
+    semester = args.from_semester if args.from_semester else input(
+        'Please enter desired semester: ')
+    course = args.from_course if args.from_course else input(
+        'Please enter desired course: ')
     user = args.user if args.user else input('Please enter your username: ')
-    password = args.pw if args.pw else input(f'Please enter your password ({user}): ')
+    password = args.pw if args.pw else input(
+        f'Please enter your password ({user}): ')
     if password == '':
         password = user
 
     driver = login(user, password, args.browser)
 
-    student_ids = get_students_from_course(driver, args.from_semester, args.from_course)
+    student_ids = get_students_from_course(
+        driver, args.from_semester, args.from_course)
     with open(f"students_{semester.replace(' ', '_')}_{course}.txt", "w") as output_file:
         for line in student_ids:
             output_file.write("".join(line) + "\n")
@@ -74,5 +78,5 @@ if args.get_grades:
         driver = login(user, user, args.browser)
         print(f"Getting user {user} grades now.")
         get_grades(driver, user, user, args.from_semester, args.from_course)
-            
+
 # --list --skip-try --get-grades --from-semester --from-course

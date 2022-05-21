@@ -14,13 +14,31 @@ import json
 
 dirs = json.load(open('dirs.json'))
 
+
 def get_latest_in_dir(dir):
-    list_of_files = glob.glob(f'{dir}*') # * means all if need specific format then *.csv
+    """Function to get latest modified file in a given directory.
+
+    Args:
+        dir (str): Directory from where to search.
+
+    Returns:
+        str: Filename of most recently modified file (whole path).
+    """
+    # * means all if need specific format then *.csv
+    list_of_files = glob.glob(f'{dir}*')
     latest_file = max(list_of_files, key=os.path.getctime)
     print(latest_file)
     return latest_file
 
+
 def go_to_course(driver, course_title, semester):
+    """With driver at homepage, go to a given course within a given semester.
+
+    Args:
+        driver (selenium.webdriver): Selenium WebDriver instance at NDHU's e-learning homepage.
+        course_title (str): Must match the course name in elearning dropdown.
+        semester (str): Must match the semester in elearning dropdown.
+    """
     wait = WebDriverWait(driver, 600)
     # find link for semester
     semester_link = wait.until(
@@ -34,7 +52,17 @@ def go_to_course(driver, course_title, semester):
         EC.element_to_be_clickable((By.CSS_SELECTOR, f"[title*='{course_title}']")))
     course_link.click()
 
-def from_grades_page_click_file(driver, username, assignment_link, hints): #"Midterm Exam File Upload"
+
+# "Midterm Exam File Upload"
+def from_grades_page_click_file(driver, username, assignment_link, hints):
+    """With driver at a given user's grades in some class, navigate to to a given assignment link and then try to click on a file containing exactly one of the given hints.
+
+    Args:
+        driver (selenium.webdriver): Selenium WebDriver instance at a given user's class grades page.
+        username (str): Student ID of targeted user.
+        assignment_link (str): Must match the assignment's link in elearning.
+        hints (str): Usually .pdf, .doc, or .odt. You are free to try other hints, especially if the assignment asks for a specific filename format.
+    """
     driver.find_element_by_partial_link_text(assignment_link).click()
     time.sleep(2)
     for hint in hints:
@@ -45,13 +73,15 @@ def from_grades_page_click_file(driver, username, assignment_link, hints): #"Mid
             while (get_latest_in_dir(dirs["download"]).startswith("Unconfirmed")):
                 time.sleep(2)
             downloaded_file = get_latest_in_dir(dirs["download"])
-            new_filename = get_latest_in_dir(dirs["download"]).replace(hint, f"_{username}{hint}")
+            new_filename = get_latest_in_dir(
+                dirs["download"]).replace(hint, f"_{username}{hint}")
             os.rename(downloaded_file, new_filename)
             break
         except NoSuchElementException as e:
             print(f"Error: no link containing {hint} found. ")
             if True:
                 print(e)
+
 
 def get_unchanged(candidates, browser):
     """Helper function to get student ids with unchanged passwords.
@@ -83,6 +113,14 @@ def get_unchanged(candidates, browser):
 
 
 def dir_path(string):
+    """Determine if a path is a file.
+
+    Args:
+        string (str): Path of interest.
+
+    Returns:
+        path: if string is a file, NotADirectoryError(string)
+    """
     if os.path.isfile(string):
         return string
     else:
@@ -164,10 +202,10 @@ def login(_username, _password, browser):
         profile = webdriver.ChromeOptions()
         profile.add_argument('ignore-certificate-errors')
         profile.add_experimental_option("prefs", {
-        "download.default_directory": dirs['download'],
-        "download.prompt_for_download": False,
-        "download.directory_upgrade": True,
-        "safebrowsing.enabled": True
+            "download.default_directory": dirs['download'],
+            "download.prompt_for_download": False,
+            "download.directory_upgrade": True,
+            "safebrowsing.enabled": True
         })
         driver = webdriver.Chrome(chrome_options=profile)
     elif browser == 'firefox':
@@ -271,7 +309,7 @@ def get_grades(driver, username, password, semester="all", course="all"):
             grades_link.click()
             time.sleep(2)
             hints = ['.doc', '.pdf', '.odt']
-            from_grades_page_click_file(driver, username, 'Midterm Exam', hints)
+            from_grades_page_click_file(
+                driver, username, 'Midterm Exam', hints)
             time.sleep(2)
         driver.quit()
-
