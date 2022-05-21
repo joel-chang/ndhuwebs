@@ -1,10 +1,10 @@
 {
-    "desc"      : "La razon para tener una contrasena diferente para ELearning de NDHU",
-    "list"      : "Direccion de la lista de estudiantes (si ya sabes quienes no han cambiado su contrasena)",
-    "genlist"   : "No tenes una lista? Podes usar esta opcion (bajo construccion)",
-    "skiptry"   : "Para saltarse la confirmacion de la contrasena default en cada cuenta.",
-    "getgrades" : "Si por alguna razon tambien queres saber que notas tienen",
-    "browser"   : "Tu navegador favorito, con tal sea cromo o el fuegozorro",
-    "lang"      : "Change this doc's language (en). 更改此文檔的語言 NA. Cambia el lenguaje de esta guia (zh).",
-    "lang_ok"   : "El lenguage se ha cambiado exitosamente."
+    "desc"      : "Why your NDHU E-Learning password should be different from your usual password.",
+    "list"      : "Path to list of students (if you happen to know those who haven't changed their passwords).",
+    "genlist"   : "Too lazy to give a list? Use this option. (W.I.P.)",
+    "skiptry"   : "When you just know that your input is right or that no one changes their passwords.",
+    "getgrades" : "If you also need to know grades for some reason, proceed with caution.",
+    "browser"   : "Your favorite browser, as long as it's either chrome or firefox.",
+    "lang"      : "Change this doc's language. 更改此文檔的語言. Cambia el lenguaje de este texto.",
+    "lang_ok"   : "Language has been changed successfully."
     }

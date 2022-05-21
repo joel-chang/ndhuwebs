@@ -9,6 +9,30 @@ from selenium.common.exceptions import NoSuchElementException,  WebDriverExcepti
 import time
 import os
 
+def go_to_course(driver, course_title, semester):
+    wait = WebDriverWait(driver, 600)
+    # find link for semester
+    semester_link = wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, f"[title*='{semester}")))
+    semester_elem = semester_link.find_element_by_xpath("..")
+    semester_box = semester_elem.find_element_by_xpath("img[1]")
+    semester_box.click()
+
+    # find link for course
+    course_link = wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, f"[title*='{course_title}']")))
+    course_link.click()
+
+def from_grades_page_click_file(driver, assignment_link, filetype): #"Midterm Exam File Upload"
+    driver.find_element_by_partial_link_text(assignment_link).click()
+    time.sleep(2)
+    try:
+        driver.find_element_by_partial_link_text(filetype).click()
+        print(f"File with hint {filetype} was clicked.")
+    except NoSuchElementException as e:
+        print(f"Error: no link containing {filetype} found. ")
+        if True:
+            print(e)
 
 def get_unchanged(candidates, browser):
     """Helper function to get student ids with unchanged passwords.
@@ -22,16 +46,19 @@ def get_unchanged(candidates, browser):
     """
     unchanged = []
     for cand in candidates:
-        driver = login(cand, cand, 'chrome')
+        driver = login(cand, cand, browser)
 
         if driver is None:
             print(f'User {cand} could not login with password {cand}.')
-            with open('bad.txt', 'a') as the_file:
+            with open('changed.txt', 'a') as the_file:
                 the_file.write(f"{cand}\n")
         else:
             print(f'User {cand} has not changed their password.')
             unchanged.append(cand)
+            with open('unchanged.txt', 'a') as the_file:
+                the_file.write(f"{cand}\n")
             # get_grades(driver, cand, cand)
+            driver.quit()
 
     return unchanged
 
@@ -117,6 +144,12 @@ def login(_username, _password, browser):
     if browser == 'chrome':
         profile = webdriver.ChromeOptions()
         profile.add_argument('ignore-certificate-errors')
+        profile.add_experimental_option("prefs", {
+        "download.default_directory": r"/home/joelchang/Projects/ndhuwebs/",
+        "download.prompt_for_download": False,
+        "download.directory_upgrade": True,
+        "safebrowsing.enabled": True
+        })
         driver = webdriver.Chrome(chrome_options=profile)
     elif browser == 'firefox':
         profile.accept_untrusted_certs = True
@@ -148,7 +181,7 @@ def login(_username, _password, browser):
         return driver
 
 
-def get_grades(driver, username, password):
+def get_grades(driver, username, password, semester="all", course="all"):
     """
     Given a driver at the NDHU elearning dashboard, this function will 
     start to get the grades that have been entered by teachers. 
@@ -165,50 +198,60 @@ def get_grades(driver, username, password):
         new_info = []
         # //*[@id="objTreeMenu_1_node_1_1_2"]/nobr/a
         time.sleep(4)
-        tree_menu_elements = driver.find_elements(
-            by=By.CLASS_NAME, value="treeMenuDefault")
-        tree_menus_ids = []
-        time.sleep(3)
-        for element in tree_menu_elements:
-            tree_menus_ids.append(str(element.get_attribute("id")).replace(
-                "objTreeMenu_1_node_1_", '').split('_'))
-        print(tree_menus_ids)
-        for i in tree_menus_ids:
-            if len(i) == 1:
-                # semester index
-                time.sleep(2)
-                semester = driver.find_element_by_xpath(
-                    f'//*[@id="objTreeMenu_1_node_1_{i[0]}"]/nobr/a/span')
-                semester_text = semester.text
-            elif len(i) == 2:
-                # course index
-                time.sleep(2)
-                course = driver.find_element_by_xpath(
-                    f'//*[@id="objTreeMenu_1_node_1_{i[0]}_{i[1]}"]/nobr/a')
-                course_text = course.text
-                course_link = course.get_attribute("href")
-                driver.get(course_link)
-                grades_link = driver.find_element(
-                    by=By.LINK_TEXT, value='Grades')
-                grades_link.click()
-                # from here, get the last row in each column
-                time.sleep(2)
-                num_r0 = driver.find_elements(by=By.CLASS_NAME, value='r0')
-                num_r1 = driver.find_elements(by=By.CLASS_NAME, value='r1')
-                last_is_1 = False
-                if len(num_r0) == len(num_r1):
-                    last_is_1 = True
-                # check if even and odds are the same
-                total_rows = len(num_r0) + len(num_r1)
-                last_row = total_rows + 1  # one empty tr + number of r0 + number of r1
-                time.sleep(2)
-                total_score = driver.find_element_by_xpath(
-                    f'//*[@id="user-grade"]/tbody/tr[{last_row}]/td[4]/span').text
-                print(f'    Total score: {total_score}')
-                new = [semester_text, course_text, total_score]
-                new_info.append(new)
-                driver.get("http://www.elearn.ndhu.edu.tw/moodle/")
-        new_student.set_grades(new_info)
-        for piece in new_student.grades:
-            print(piece)
+        if semester == 'all' and course == 'all':
+            tree_menu_elements = driver.find_elements(
+                by=By.CLASS_NAME, value="treeMenuDefault")
+            tree_menus_ids = []
+            time.sleep(3)
+            for element in tree_menu_elements:
+                tree_menus_ids.append(str(element.get_attribute("id")).replace(
+                    "objTreeMenu_1_node_1_", '').split('_'))
+            print(tree_menus_ids)
+            for i in tree_menus_ids:
+                if len(i) == 1:
+                    # semester index
+                    time.sleep(2)
+                    semester = driver.find_element_by_xpath(
+                        f'//*[@id="objTreeMenu_1_node_1_{i[0]}"]/nobr/a/span')
+                    semester_text = semester.text
+                elif len(i) == 2:
+                    # course index
+                    time.sleep(2)
+                    course = driver.find_element_by_xpath(
+                        f'//*[@id="objTreeMenu_1_node_1_{i[0]}_{i[1]}"]/nobr/a')
+                    course_text = course.text
+                    course_link = course.get_attribute("href")
+                    driver.get(course_link)
+                    grades_link = driver.find_element(
+                        by=By.LINK_TEXT, value='Grades')
+                    grades_link.click()
+                    # from here, get the last row in each column
+                    time.sleep(2)
+                    num_r0 = driver.find_elements(by=By.CLASS_NAME, value='r0')
+                    num_r1 = driver.find_elements(by=By.CLASS_NAME, value='r1')
+                    last_is_1 = False
+                    if len(num_r0) == len(num_r1):
+                        last_is_1 = True
+                    # check if even and odds are the same
+                    total_rows = len(num_r0) + len(num_r1)
+                    last_row = total_rows + 1  # one empty tr + number of r0 + number of r1
+                    time.sleep(2)
+                    total_score = driver.find_element_by_xpath(
+                        f'//*[@id="user-grade"]/tbody/tr[{last_row}]/td[4]/span').text
+                    print(f'    Total score: {total_score}')
+                    new = [semester_text, course_text, total_score]
+                    new_info.append(new)
+                    driver.get("http://www.elearn.ndhu.edu.tw/moodle/")
+            new_student.set_grades(new_info)
+            for piece in new_student.grades:
+                print(piece)
+        elif semester != 'all' and course != 'all':
+            go_to_course(driver, semester=semester, course_title=course)
+            grades_link = driver.find_element(
+                by=By.LINK_TEXT, value='Grades')
+            grades_link.click()
+            time.sleep(2)
+            from_grades_page_click_file(driver, 'Midterm Exam', 'doc')
+            time.sleep(2)
         driver.quit()
+
