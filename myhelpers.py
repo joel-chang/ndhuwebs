@@ -8,6 +8,17 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException,  WebDriverException
 import time
 import os
+import glob
+import json
+
+
+dirs = json.load(open('dirs.json'))
+
+def get_latest_in_dir(dir):
+    list_of_files = glob.glob(f'{dir}*') # * means all if need specific format then *.csv
+    latest_file = max(list_of_files, key=os.path.getctime)
+    print(latest_file)
+    return latest_file
 
 def go_to_course(driver, course_title, semester):
     wait = WebDriverWait(driver, 600)
@@ -23,16 +34,24 @@ def go_to_course(driver, course_title, semester):
         EC.element_to_be_clickable((By.CSS_SELECTOR, f"[title*='{course_title}']")))
     course_link.click()
 
-def from_grades_page_click_file(driver, assignment_link, filetype): #"Midterm Exam File Upload"
+def from_grades_page_click_file(driver, username, assignment_link, hints): #"Midterm Exam File Upload"
     driver.find_element_by_partial_link_text(assignment_link).click()
     time.sleep(2)
-    try:
-        driver.find_element_by_partial_link_text(filetype).click()
-        print(f"File with hint {filetype} was clicked.")
-    except NoSuchElementException as e:
-        print(f"Error: no link containing {filetype} found. ")
-        if True:
-            print(e)
+    for hint in hints:
+        try:
+            driver.find_element_by_partial_link_text(hint).click()
+            print(f"File with hint '{hint}' was clicked.")
+            time.sleep(2)
+            while (get_latest_in_dir(dirs["download"]).startswith("Unconfirmed")):
+                time.sleep(2)
+            downloaded_file = get_latest_in_dir(dirs["download"])
+            new_filename = get_latest_in_dir(dirs["download"]).replace(hint, f"{username}_{hint}")
+            os.rename(downloaded_file, new_filename)
+            break
+        except NoSuchElementException as e:
+            print(f"Error: no link containing {hint} found. ")
+            if True:
+                print(e)
 
 def get_unchanged(candidates, browser):
     """Helper function to get student ids with unchanged passwords.
@@ -145,7 +164,7 @@ def login(_username, _password, browser):
         profile = webdriver.ChromeOptions()
         profile.add_argument('ignore-certificate-errors')
         profile.add_experimental_option("prefs", {
-        "download.default_directory": r"/home/joelchang/Projects/ndhuwebs/",
+        "download.default_directory": dirs['download'],
         "download.prompt_for_download": False,
         "download.directory_upgrade": True,
         "safebrowsing.enabled": True
@@ -251,7 +270,8 @@ def get_grades(driver, username, password, semester="all", course="all"):
                 by=By.LINK_TEXT, value='Grades')
             grades_link.click()
             time.sleep(2)
-            from_grades_page_click_file(driver, 'Midterm Exam', 'doc')
+            hints = ['.doc', '.pdf', '.odt']
+            from_grades_page_click_file(driver, username, 'Midterm Exam', hints)
             time.sleep(2)
         driver.quit()
 
