@@ -4,14 +4,14 @@ import json
 from course import get_students_from_course
 
 
-helpdoc = json.load(open("helpdoc.json",))
+helpdoc = json.load(open("helpdoc/helpdoc.json",))
 parser = argparse.ArgumentParser(description=helpdoc["desc"])
 parser.add_argument('--list', type=dir_path, help=helpdoc["list"])
 parser.add_argument('--check-change', action='store_true')
 parser.add_argument('--generate-list', action='store_true', help=helpdoc["genlist"])
 parser.add_argument('--skip-try', action='store_true', help=helpdoc["skiptry"])
 parser.add_argument('--get-grades', action='store_true', help=helpdoc["getgrades"])
-parser.add_argument('--browser', type=str, default='chrome', help=helpdoc["browser"])
+parser.add_argument('--browser', type=str, default='firefox', help=helpdoc["browser"])
 parser.add_argument('--lang', type=str, help=helpdoc["lang"])
 parser.add_argument('--get-students', action='store_true')
 parser.add_argument('--from-semester', type=str)
