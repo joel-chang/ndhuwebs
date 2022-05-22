@@ -197,7 +197,6 @@ def login(_username, _password, browser):
     Returns:
         selenium.webdriver: driver at NDHU elearning dashboard.
     """
-    profile = webdriver.FirefoxProfile()
     if browser == 'chrome':
         profile = webdriver.ChromeOptions()
         profile.add_argument('ignore-certificate-errors')
@@ -209,6 +208,11 @@ def login(_username, _password, browser):
         })
         driver = webdriver.Chrome(chrome_options=profile)
     elif browser == 'firefox':
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference("browser.download.folderList", 2)
+        profile.set_preference("browser.download.manager.showWhenStarting", False)
+        profile.set_preference("browser.download.dir", dirs['download'])
+        profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "attachment/csv")
         profile.accept_untrusted_certs = True
         driver = webdriver.Firefox(firefox_profile=profile)
 
