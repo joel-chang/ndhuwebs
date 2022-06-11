@@ -1,0 +1,12 @@
+{
+    "semester": "Please enter target semester: ",
+    "course": "Please enter target course: ",
+    "assignment": "Please enter target assingment: ",
+    "your_username": "Please enter your username: ",
+    "your_password": "Please enter your password ",
+    "get_grades_set": "--get-grades is set. Continue? (y/n) ",
+    "cred_warning": "In order to get students from a certain course, your credentials are required.\nYour credentials are only used to login to the eLearning portal once.",
+    "import_list": "Importing list (id and password) from ",
+    "id_n_pw": "ID and passwords found in list: ",
+    "empty_cmd": "No args given. Try --requests, --lang, --get-students"
+}
