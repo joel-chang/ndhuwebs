@@ -1,8 +1,10 @@
+from tabnanny import check
 from selenium.webdriver.common.by import By
 from student_def import Student
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.action_chains import ActionChains
 from main_help import get_latest_in_dir
 import time
 import os
@@ -10,6 +12,25 @@ import json
 
 
 dirs = json.load(open('dirs.json'))
+
+
+def expand_all_semesters(driver, semester_name):
+    base_xpath = '//*[@id="objTreeMenu_1_node_1_'
+    semester_elements = []
+    ind = 1
+    print('All found semesters:')
+    while(len(driver.find_elements_by_xpath(f'{base_xpath}{ind}"]')) != 0):
+        semester_elements.append(driver.find_element_by_xpath(f'{base_xpath}{ind}"]'))
+        print(driver.find_element_by_xpath(f'{base_xpath}{ind}"]').text)
+        ind += 1
+    
+    for element in semester_elements:
+        if semester_name in element.find_element_by_xpath('.//a').text:
+            print("Found target semester.")
+            print(element.find_element_by_xpath('.//a').text)
+            print("Clicking target semester")
+            element.find_elements_by_xpath('.//img')[0].click()
+    return semester_elements
 
 
 def go_to_course(driver, course_title, semester):
@@ -20,17 +41,21 @@ def go_to_course(driver, course_title, semester):
         course_title (str): Must match the course name in elearning dropdown.
         semester (str): Must match the semester in elearning dropdown.
     """
+    print("Going to course.")
+    expand_all_semesters(driver, semester)
     wait = WebDriverWait(driver, 600)
-    # find link for semester
-    semester_link = wait.until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, f"[title*='{semester}")))
-    semester_elem = semester_link.find_element_by_xpath("..")
-    semester_box = semester_elem.find_element_by_xpath("img[1]")
-    semester_box.click()
-
+    # # find link for semester
+    # print("Waiting for semester link to be clickable.")
+    # semester_link = wait.until(
+    #     EC.element_to_be_clickable((By.CSS_SELECTOR, f"//a[@title='{semester}']")))
+    # print("Going to semester link parent.")
+    # semester_elem = semester_link.find_element_by_xpath("..")
+    # print("Going to semester link sibling (the box).")
     # find link for course
-    course_link = wait.until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, f"[title*='{course_title}']")))
+    time.sleep(3)
+    print("Waiting for course link.")
+    course_link = driver.find_element_by_partial_link_text(course_title)
+    print("Clicking on course.")
     course_link.click()
 
 
@@ -55,9 +80,11 @@ def from_grades_page_click_file(driver, username, assignment_link, hints):
             while (get_latest_in_dir(dirs["download"]).startswith("Unconfirmed")):
                 time.sleep(2)
             downloaded_file = get_latest_in_dir(dirs["download"])
+            grade = driver.find_element_by_class_name('grade').text
+            grade = grade.replace(' ', '_').replace('/','outOf').replace('.', '')
             new_filename = get_latest_in_dir(
-                dirs["download"]).replace(hint, f"_{username}{hint}")
-            os.rename(downloaded_file, new_filename)
+                dirs["download"]).replace(hint, f"_{username}_{grade}{hint}")
+            os.rename(downloaded_file, f'{new_filename}')
             found_one = True
             break
         except NoSuchElementException as e:
@@ -67,7 +94,6 @@ def from_grades_page_click_file(driver, username, assignment_link, hints):
 
     if found_one is False:
         print(f'No files found for user {username}.')
-
 
 def get_grades(driver, username, password, semester="all", course="all", assignment="all"):
     """

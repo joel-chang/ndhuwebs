@@ -1,10 +1,19 @@
 {
     "desc"      : "Why your NDHU E-Learning password should be different from your usual password.",
-    "list"      : "Path to list of students (if you happen to know those who haven't changed their passwords).",
+    "idlist"      : "Path to list of students (if you happen to know those who haven't changed their passwords).",
     "genlist"   : "Too lazy to give a list? Use this option. (W.I.P.)",
     "skiptry"   : "When you just know that your input is right or that no one changes their passwords.",
     "getgrades" : "If you also need to know grades for some reason, proceed with caution.",
     "browser"   : "Your favorite browser, as long as it's either chrome or firefox.",
     "lang"      : "Change this doc's language. 更改此文檔的語言. Cambia el lenguaje de este texto.",
-    "lang_ok"   : "Language has been changed successfully."
+    "lang_ok"   : "Language has been changed successfully.",
+    "checkchange": "If idlist is given, check if users in list have changed their passwords.",
+    "getstudents": "Get students from specific course.",
+    "assignment": "Target assignment. must be used with --get-grades.",
+    "semester": "Target semester.",
+    "requests": "Indicate if requests should be used instead of selenium. Faster but less tested.",
+    "idpwlist": "Specify path of file which contains list of IDs and passwords.",
+    "course": "Target course.",
+    "user": "Username.",
+    "pw": "Password."
     }
