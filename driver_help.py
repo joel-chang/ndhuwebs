@@ -69,7 +69,19 @@ def from_grades_page_click_file(driver, username, assignment_link, hints):
         assignment_link (str): Must match the assignment's link in elearning.
         hints (str): Usually .pdf, .doc, or .odt. You are free to try other hints, especially if the assignment asks for a specific filename format.
     """
-    driver.find_element_by_partial_link_text(assignment_link).click()
+    target_ass = driver.find_elements_by_link_text(assignment_link)
+    print(f"{len(target_ass)} elements(s) match.")
+    if len(target_ass) == 1:
+        print("One perfect match for target assingment.")
+    elif len(target_ass) == 0:
+        target_ass = driver.find_elements_by_partial_link_test(assignment_link)
+        if len(target_ass) == 0:
+            print('No matches for target element.')
+        else:
+            print(f"{len(target_ass)} elements(s) partially match. Clicking the first one.")
+    else:
+        print("Multiple perfect matches for target assignment. Clicking the first one.")
+    target_ass[0].click()
     time.sleep(2)
     found_one = False
     for hint in hints:
@@ -82,6 +94,8 @@ def from_grades_page_click_file(driver, username, assignment_link, hints):
             downloaded_file = get_latest_in_dir(dirs["download"])
             grade = driver.find_element_by_class_name('grade').text
             grade = grade.replace(' ', '_').replace('/','outOf').replace('.', '')
+            assignment_name = assignment_link.replace(' ', '_').replace('/','outOf')
+            assignment_name = assignment_name.replace('.', '').replace('-', '_')
             new_filename = get_latest_in_dir(
                 dirs["download"]).replace(hint, f"_{username}_{grade}{hint}")
             os.rename(downloaded_file, f'{new_filename}')
@@ -165,7 +179,7 @@ def get_grades(driver, username, password, semester="all", course="all", assignm
                 by=By.LINK_TEXT, value='Grades')
             grades_link.click()
             time.sleep(2)
-            hints = ['.doc', '.pdf', '.odt', '.ppt', '.pptx', '.docx']
+            hints = ['.doc', '.pdf', '.odt', '.ppt', '.pptx', '.docx', '.xlsx', '.xlsm', '.xlsb', '.xltx', '.xltm', '.xls']
             from_grades_page_click_file(
                 driver, username, assignment, hints)
             time.sleep(2)
